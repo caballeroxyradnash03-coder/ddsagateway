@@ -1,18 +1,28 @@
 <?php
 namespace App\Services;
 use App\Traits\ConsumesExternalService;
-class User1Service{
+class User1Service {
 	use ConsumesExternalService;
+
 	/**
-	* The base uri to consume the User1 Service
-	* @var string
-	*/
+	 * The base uri to consume the User1 Service
+	 * @var string
+	 */
 	public $baseUri;
+
+	/**
+	 * The secret to consume the User1 Service
+	 * @var string
+	 */
+	public $secret;
 
 	public function __construct()
 	{
-		$this->baseUri = config('services.users1.base_uri') ?: env('USERS1_SERVICE_BASE_URL');
+		$this->baseUri = config('services.users1.base_uri') 
+		?: env('USERS1_SERVICE_BASE_URL');
+		$this->secret = config('services.users1.secret');
 	}
+
 
 	/**
 	 * Obtain the full list of Users from User1 Site

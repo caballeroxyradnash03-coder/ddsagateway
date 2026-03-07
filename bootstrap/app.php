@@ -2,6 +2,8 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
+use Laravel\Passport\Passport;
+
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
 ))->bootstrap();
@@ -27,7 +29,19 @@ $app->withFacades();
 
 $app->withEloquent();
 
- $app->configure('services');
+$app->configure('services');
+$app->configure('auth');
+$app->configure('passport');
+
+// Lumen does not support Laravel Passport's default route registration.
+// Prevent Passport from registering its own routes so we can register them via LumenPassport.
+Passport::$registersRoutes = false;
+
+// Enable auth middleware so Passport can use it for protected routes.
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+    'client.credentials' => Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
+]);
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -93,8 +107,10 @@ $app->configure('app');
 */
 
 // $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+ $app->register(App\Providers\AuthServiceProvider::class);
+ $app->register(Laravel\Passport\PassportServiceProvider::class);
+ $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

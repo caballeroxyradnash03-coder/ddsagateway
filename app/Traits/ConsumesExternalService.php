@@ -23,6 +23,11 @@ trait ConsumesExternalService
             'base_uri' => $this->baseUri,
         ]);
 
+        if (isset($this->secret)) {
+            // If a secret is set, include it in the headers for authentication
+            $headers['Authorization'] =  $this->secret;
+        }
+
         // Prepare request options depending on HTTP method
         $options = [
             'headers' => $headers,
@@ -38,9 +43,21 @@ trait ConsumesExternalService
         }
 
         // Perform the request
-        $response = $client->request($method, $requestUrl, $options);
+        // Disable throwing exceptions for 4xx/5xx so we can propagate the response body
+        $options['http_errors'] = false;
 
-        // Return response body contents
+        try {
+            $response = $client->request($method, $requestUrl, $options);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // If the request failed before getting a response, return a structured error
+            return json_encode([
+                'error' => 'service_unavailable',
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+            ]);
+        }
+
+        // Return response body contents (may contain an error JSON from the target service)
         return $response->getBody()->getContents();
     }
 }

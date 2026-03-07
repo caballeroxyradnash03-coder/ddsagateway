@@ -13,7 +13,11 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \Laravel\Passport\Console\InstallCommand::class,
+        \Laravel\Passport\Console\KeysCommand::class,
+        \Laravel\Passport\Console\ClientCommand::class,
+        \Laravel\Passport\Console\HashCommand::class,
+        \Laravel\Passport\Console\PurgeCommand::class,
     ];
 
     /**
@@ -25,5 +29,20 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //
+    }
+
+    /**
+     * Get the Artisan application instance.
+     *
+     * We override this to ensure commands registered via default names
+     * (via the Symfony AsCommand attribute) are properly resolvable.
+     *
+     * @return \Illuminate\Console\Application
+     */
+    protected function getArtisan()
+    {
+        $artisan = parent::getArtisan();
+        $artisan->setContainerCommandLoader();
+        return $artisan;
     }
 }

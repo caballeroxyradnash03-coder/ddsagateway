@@ -25,6 +25,7 @@ $router->put('/users1/{id}', 'User1Controller@update');
 $router->patch('/users1/{id}', 'User1Controller@update');
 $router->delete('/users1/{id}', 'User1Controller@destroy');
 
+
 // API Gateway routes for Site2 users
 $router->get('/users2', 'User2Controller@index');
 $router->post('/users2', 'User2Controller@add');
